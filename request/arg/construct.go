@@ -1,7 +1,7 @@
 package arg
 
 import (
-	"ghoulhyk/go-generator-net/types/const"
+	"github.com/ghoulhyk/go-generator-net/types/const"
 )
 
 func Custom(name string, customType any) DynamicArg {

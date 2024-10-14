@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"ghoulhyk/go-generator-net/types/const"
+	"github.com/ghoulhyk/go-generator-net/types/const"
 	"github.com/pkg/errors"
 )
 

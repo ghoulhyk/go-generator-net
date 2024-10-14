@@ -2,9 +2,9 @@ package gen
 
 import (
 	"bytes"
-	"ghoulhyk/go-generator-net/gen/templates"
-	"ghoulhyk/go-generator-net/types"
-	"ghoulhyk/go-generator-net/util/fileutil"
+	"github.com/ghoulhyk/go-generator-net/gen/templates"
+	"github.com/ghoulhyk/go-generator-net/types"
+	"github.com/ghoulhyk/go-generator-net/util/fileutil"
 	"go/format"
 	"golang.org/x/tools/go/packages"
 	"os"

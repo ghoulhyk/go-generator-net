@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
-	"ghoulhyk/go-generator-net/gen"
-	"ghoulhyk/go-generator-net/loader"
-	"ghoulhyk/go-generator-net/types"
-	"ghoulhyk/go-generator-net/util/fileutil"
-	"ghoulhyk/go-generator-net/util/jsonutil"
+	"github.com/ghoulhyk/go-generator-net/gen"
+	"github.com/ghoulhyk/go-generator-net/loader"
+	"github.com/ghoulhyk/go-generator-net/types"
+	"github.com/ghoulhyk/go-generator-net/util/fileutil"
+	"github.com/ghoulhyk/go-generator-net/util/jsonutil"
 	"github.com/pkg/errors"
 	"os"
 	"path/filepath"

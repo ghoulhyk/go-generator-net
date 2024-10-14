@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-	"ghoulhyk/go-generator-net/types/const"
+	"github.com/ghoulhyk/go-generator-net/types/const"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"net/url"

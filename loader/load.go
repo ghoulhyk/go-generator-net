@@ -3,9 +3,9 @@ package loader
 import (
 	"bytes"
 	"fmt"
-	"ghoulhyk/go-generator-net/loader/templates"
-	"ghoulhyk/go-generator-net/request"
-	"ghoulhyk/go-generator-net/util/fileutil"
+	"github.com/ghoulhyk/go-generator-net/loader/templates"
+	"github.com/ghoulhyk/go-generator-net/request"
+	"github.com/ghoulhyk/go-generator-net/util/fileutil"
 	"github.com/pkg/errors"
 	"go/ast"
 	"go/types"

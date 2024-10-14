@@ -1,7 +1,7 @@
 package req
 
 import (
-	"ghoulhyk/go-generator-net/types/const"
+	"github.com/ghoulhyk/go-generator-net/types/const"
 )
 
 func GET(name string, path string) Req {

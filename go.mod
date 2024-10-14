@@ -1,4 +1,4 @@
-module ghoulhyk/go-generator-net
+module github.com/ghoulhyk/go-generator-net
 
 go 1.22
 

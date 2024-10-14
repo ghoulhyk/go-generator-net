@@ -1,9 +1,9 @@
 package req
 
 import (
-	"ghoulhyk/go-generator-net/request/arg"
-	"ghoulhyk/go-generator-net/request/resp"
-	"ghoulhyk/go-generator-net/types/const"
+	"github.com/ghoulhyk/go-generator-net/request/arg"
+	"github.com/ghoulhyk/go-generator-net/request/resp"
+	"github.com/ghoulhyk/go-generator-net/types/const"
 )
 
 type Req struct {

@@ -1,7 +1,7 @@
 package request
 
 import (
-	"ghoulhyk/go-generator-net/request/req"
+	"github.com/ghoulhyk/go-generator-net/request/req"
 )
 
 // Interface
