@@ -1,0 +1,130 @@
+package main
+
+import (
+	"encoding/json"
+	"errors"
+	"github.com/samber/lo"
+	"os"
+	"reflect"
+	"regexp"
+	"slices"
+	"strings"
+	templ "{{ .TmplPkg }}"
+	"ghoulhyk/go-generator-net/netReq/request"
+	"ghoulhyk/go-generator-net/netReq/request/arg"
+	"ghoulhyk/go-generator-net/netReq/types"
+	_const "ghoulhyk/go-generator-net/netReq/types/const"
+)
+
+var serviceList = []request.Interface{
+    {{ range $name := .ServNames }}
+	    templ.{{ $name }}{},
+    {{ end }}
+	//templ.Common2{},
+}
+
+var pkgPathReg, _ = regexp.Compile("(([^[\\] ,\"']+/)+([^[\\] ,\"']+))\\.")
+var pkgPathWithoutLastReg, _ = regexp.Compile("([^[\\] ,\"']+/)+")
+
+func main() {
+	var result []types.Service
+
+	for _, serv := range serviceList {
+		servReflectType := reflect.TypeOf(serv)
+		decodedServ := types.Service{
+			StructName:  servReflectType.Name(),
+			TmplPkgPath: servReflectType.PkgPath(),
+		}
+
+		baseUrl := strings.TrimSpace(serv.BaseUrl())
+		baseUrlFunc := serv.BaseUrlFunc()
+		if baseUrl != "" {
+			decodedServ.GetBaseUrlMode = 1
+			decodedServ.BaseUrl = baseUrl
+		} else if baseUrlFunc != nil {
+			decodedServ.GetBaseUrlMode = 2
+		} else {
+			fail(errors.New("BaseUrl和BaseUrlFunc不能同时为空"))
+		}
+		for _, req := range serv.Reqs() {
+			decodedReq := types.Req{
+				Name:       req.Name,
+				Path:       req.Path,
+				Method:     req.Method,
+				ReturnType: decodeType(req.ReturnType),
+			}
+
+			decodedReq.QueryArgs = decodeArgs(req.QueryArgs)
+			decodedReq.PathArgs = decodeArgs(req.PathArgs)
+			decodedReq.BodyArgs = decodeArgs(req.BodyArgs)
+
+			decodedServ.Reqs = append(decodedServ.Reqs, decodedReq)
+		}
+
+		result = append(result, decodedServ)
+	}
+	jsonBytes, _ := json.Marshal(result)
+	os.Stdout.Write(jsonBytes)
+}
+
+func decodeType(val any) types.RType {
+	reflectType := reflect.TypeOf(val)
+	ident := reflectType.String()
+	pkgPathList := []string{reflectType.PkgPath()}
+	subPkgPathList := lo.Map(pkgPathReg.FindAllStringSubmatch(ident, -1), func(item []string, index int) string {
+		return item[1]
+	})
+	if len(subPkgPathList) > 0 {
+		pkgPathList = slices.Concat(pkgPathList, subPkgPathList)
+		ident = pkgPathWithoutLastReg.ReplaceAllString(ident, "")
+	}
+	pkgPathList = lo.Uniq(pkgPathList)
+
+	return types.RType{
+		Ident:       ident,
+		PkgPathList: pkgPathList,
+	}
+}
+
+func decodeArgs(args []arg.Arg) []types.Arg {
+	if len(args) == 0 {
+		return []types.Arg{}
+	}
+
+	return lo.Map(args, func(item arg.Arg, _ int) types.Arg {
+		switch item.(type) {
+		case arg.StaticArg:
+			{
+				arg := item.(arg.StaticArg)
+				return types.StaticArg{
+					ReqName: arg.GetReqName(),
+					Value:   arg.Value,
+				}
+			}
+		case arg.DynamicArg:
+			{
+				arg := item.(arg.DynamicArg)
+
+				decodeArg := types.DynamicArg{
+					ReqName:  arg.GetReqName(),
+					ParaName: arg.ParaName,
+					Type:     arg.Type,
+				}
+				if arg.Type == _const.TypeCustom {
+					decodeArg.CustomType = lo.ToPtr(decodeType(arg.CustomType))
+				}
+				if arg.IsPtr() {
+					decodeArg.PtrType = true
+				}
+				return decodeArg
+			}
+		default:
+			panic("不支持的参数类型")
+		}
+	})
+}
+
+func fail(err error) {
+	os.Stderr.WriteString(err.Error() + "\n")
+	os.Exit(1)
+}

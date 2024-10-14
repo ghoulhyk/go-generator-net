@@ -1,0 +1,8 @@
+/vendor/
+/log/
+
+/.idea/
+/.vscode/
+
+go.sum
+
