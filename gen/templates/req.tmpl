@@ -3,7 +3,14 @@
 
 func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.ParamArgs }}{{ $arg.ParaName }} {{ $arg.TypeStr }}, {{ end }}) (*{{ .Req.ReturnType.Ident }}, error) {
 	__path__ := _import_fmt.Sprintf("{{ .Req.PathFormatter }}", {{ range .Req.ReplacePathArgNames }}{{ . }}, {{ end }})
-	__url__ := _import_path.Join(__receiver__.baseUrl(), __path__)
+	baseUrl := __receiver__.baseUrl()
+    if strings.HasSuffix(baseUrl, "/") {
+        baseUrl = strings.TrimRight(baseUrl, "/")
+    }
+    if strings.HasPrefix(__path__, "/") {
+        __path__ = strings.TrimLeft(__path__, "/")
+    }
+    __url__ := baseUrl + __path__
 
     var __body__ []byte
     {{ $bodyArgCnt := len .Req.BodyArgs }}

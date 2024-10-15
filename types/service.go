@@ -20,12 +20,12 @@ func (receiver Service) Imports() string {
 	imports := []string{
 		"_import_tmpl " + receiver.TmplPkgPath,
 		"_import_fmt fmt",
-		"_import_path path",
 		"_import_http net/http",
 		"_import_json encoding/json",
 		"_import_errors errors",
 		"_import_bytes bytes",
 		"_import_ioutil io/ioutil",
+		"_import_strings strings",
 	}
 	getArgPathListFunc := func(args []Arg) []string {
 		var pathList []string
