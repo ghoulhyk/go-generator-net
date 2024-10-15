@@ -2,15 +2,16 @@
 
 
 func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.ParamArgs }}{{ $arg.ParaName }} {{ $arg.TypeStr }}, {{ end }}) (*{{ .Req.ReturnType.Ident }}, error) {
-	__path__ := _import_fmt.Sprintf("{{ .Req.PathFormatter }}", {{ range .Req.ReplacePathArgNames }}{{ . }}, {{ end }})
-	baseUrl := __receiver__.baseUrl()
+    var __err__ error
+    __path__ := _import_fmt.Sprintf("{{ .Req.PathFormatter }}", {{ range .Req.ReplacePathArgNames }}{{ . }}, {{ end }})
+    baseUrl := __receiver__.baseUrl()
     if strings.HasSuffix(baseUrl, "/") {
         baseUrl = strings.TrimRight(baseUrl, "/")
     }
     if strings.HasPrefix(__path__, "/") {
         __path__ = strings.TrimLeft(__path__, "/")
     }
-    __url__ := baseUrl + __path__
+    __url__ := baseUrl + "/" + __path__
 
     var __body__ []byte
     {{ $bodyArgCnt := len .Req.BodyArgs }}
@@ -27,7 +28,7 @@ func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.Para
             return nil, _import_errors.New("序列化请求体失败，" + __err__.Error())
         }
     {{ end }}
-	__req__, err := _import_http.NewRequest("{{ .Req.Method }}", __url__, _import_bytes.NewReader(__body__))
+    __req__, err := _import_http.NewRequest("{{ .Req.Method }}", __url__, _import_bytes.NewReader(__body__))
 
     {{ range $arg := .Req.HeaderArgs }}
         __req__.Header.Set("{{ $arg.GetReqName }}", {{ if eq $arg.GetValWay "Dynamic" }} {{ $arg.ParaName }} {{ else if eq $arg.GetValWay "Static" }} {{ $arg.ValueStr true }} {{ end }})
@@ -37,31 +38,31 @@ func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.Para
         __req__.Header.Set("Content-Type", "application/json")
     {{ end }}
 
-	__httpClient__ := _import_http.Client{}
-	__resp__, __err__ := __httpClient__.Do(__req__)
-	if __err__ != nil {
-		__receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | 发起请求失败 | {{ .Req.Method }} | 【url=%v】 | 【message=%v】", __url__, __err__)
-		return nil, _import_errors.New("发起请求失败，" + __err__.Error())
-	}
+    __httpClient__ := _import_http.Client{}
+    __resp__, __err__ := __httpClient__.Do(__req__)
+    if __err__ != nil {
+        __receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | 发起请求失败 | {{ .Req.Method }} | 【url=%v】 | 【message=%v】", __url__, __err__)
+        return nil, _import_errors.New("发起请求失败，" + __err__.Error())
+    }
 
-	defer __resp__.Body.Close()
+    defer __resp__.Body.Close()
 
-	__respBytes__, __err__ := _import_ioutil.ReadAll(__resp__.Body)
-	if __err__ != nil {
-		__receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | 读取响应失败 | {{ .Req.Method }} | 【url=%v】 | 【message=%v】", __url__, __err__)
-		return nil, _import_errors.New("读取响应失败，" + __err__.Error())
-	}
+    __respBytes__, __err__ := _import_ioutil.ReadAll(__resp__.Body)
+    if __err__ != nil {
+        __receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | 读取响应失败 | {{ .Req.Method }} | 【url=%v】 | 【message=%v】", __url__, __err__)
+        return nil, _import_errors.New("读取响应失败，" + __err__.Error())
+    }
 
-	__result__ := &{{ .Req.ReturnType.Ident }}{}
+    __result__ := &{{ .Req.ReturnType.Ident }}{}
 
-	if err = _import_json.Unmarshal(__respBytes__, __result__); err != nil {
-		__receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | JSON解析失败 | {{ .Req.Method }} | 【url=%v】 | 【message=%v】 | 【reqResult=%v】", __url__, __err__, string(__respBytes__))
-		return nil, _import_errors.New("JSON解析失败，" + __err__.Error())
-	}
-	if !__result__.IsSuccess() {
+    if err = _import_json.Unmarshal(__respBytes__, __result__); err != nil {
+        __receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | JSON解析失败 | {{ .Req.Method }} | 【url=%v】 | 【message=%v】 | 【reqResult=%v】", __url__, __err__, string(__respBytes__))
+        return nil, _import_errors.New("JSON解析失败，" + __err__.Error())
+    }
+    if !__result__.IsSuccess() {
         return nil, __result__.ErrInfo()
-	}
-	return __result__, nil
+    }
+    return __result__, nil
 }
 
 {{ end }}
