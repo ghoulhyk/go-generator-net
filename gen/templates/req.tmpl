@@ -3,11 +3,7 @@
 
 func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.ParamArgs }}{{ $arg.ParaName }} {{ $arg.TypeStr }}, {{ end }}) (*{{ .Req.ReturnType.Ident }}, error) {
 	__path__ := _import_fmt.Sprintf("{{ .Req.PathFormatter }}", {{ range .Req.ReplacePathArgNames }}{{ . }}, {{ end }})
-	__url__, __err__ := _import_url.JoinPath(__receiver__.baseUrl(), __path__)
-	if __err__ != nil {
-		__receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | 拼接请求路径失败 | {{ .Req.Method }} | 【path=%v】 | 【message=%v】", __path__, __err__)
-		return nil, _import_errors.New("拼接请求路径失败，" + __err__.Error())
-	}
+	__url__ := _import_path.Join(__receiver__.baseUrl(), __path__)
 
     var __body__ []byte
     {{ $bodyArgCnt := len .Req.BodyArgs }}

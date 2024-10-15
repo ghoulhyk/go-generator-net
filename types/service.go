@@ -20,7 +20,7 @@ func (receiver Service) Imports() string {
 	imports := []string{
 		"_import_tmpl " + receiver.TmplPkgPath,
 		"_import_fmt fmt",
-		"_import_url net/url",
+		"_import_path path",
 		"_import_http net/http",
 		"_import_json encoding/json",
 		"_import_errors errors",
