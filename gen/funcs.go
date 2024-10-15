@@ -3,6 +3,7 @@ package gen
 import (
 	"fmt"
 	"github.com/go-openapi/inflect"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -36,6 +37,12 @@ func pascal(s string) string {
 	words := strings.FieldsFunc(s, isSeparator)
 	return pascalWords(words)
 }
+
+func Quote(s string) string {
+	return strconv.Quote(s)
+}
+
+// region inner
 
 func toString(v any) string {
 	switch v := v.(type) {
@@ -83,3 +90,5 @@ func ruleset() *inflect.Ruleset {
 	}
 	return rules
 }
+
+// endregion

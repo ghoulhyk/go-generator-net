@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ghoulhyk/go-generator-net/types/const"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 type Arg interface {
@@ -184,14 +185,18 @@ func (receiver StaticArg) GetValWay() string {
 	return "Static"
 }
 
-func (receiver StaticArg) ValueStr() string {
+func (receiver StaticArg) ValueStr(quoteStr bool) string {
 	switch receiver.Value.(type) {
 	case float32, float64:
 		return fmt.Sprintf("%f", receiver.Value)
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return fmt.Sprintf("%d", receiver.Value)
 	case string:
-		return receiver.Value.(string)
+		if quoteStr {
+			return strconv.Quote(receiver.Value.(string))
+		} else {
+			return receiver.Value.(string)
+		}
 	default:
 		return fmt.Sprintf("%v", receiver.Value)
 	}

@@ -41,6 +41,7 @@ func (receiver Service) Imports() string {
 		imports = append(imports, getArgPathListFunc(req.QueryArgs)...)
 		imports = append(imports, getArgPathListFunc(req.PathArgs)...)
 		imports = append(imports, getArgPathListFunc(req.BodyArgs)...)
+		imports = append(imports, getArgPathListFunc(req.HeaderArgs)...)
 	}
 	imports = lo.Uniq(imports)
 	imports = lo.WithoutEmpty(imports)

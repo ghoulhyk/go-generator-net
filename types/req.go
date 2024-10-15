@@ -51,7 +51,7 @@ func (receiver *Req) Preprocess() error {
 					panic(errors.Errorf("未找到path参数[%s", s))
 				}
 				if staticArg, ok := pathArg.(StaticArg); ok {
-					return url.PathEscape(staticArg.ValueStr())
+					return url.PathEscape(staticArg.ValueStr(false))
 				} else if dynamicArg, ok := pathArg.(DynamicArg); ok {
 					receiver.ReplacePathArgNames = append(receiver.ReplacePathArgNames, dynamicArg.ParaName)
 					return dynamicArg.ValueFormatter()
@@ -76,7 +76,7 @@ func (receiver *Req) Preprocess() error {
 		}
 		queryItems := lo.Map(receiver.QueryArgs, func(item Arg, _ int) string {
 			if staticArg, ok := item.(StaticArg); ok {
-				return fmt.Sprintf("%s=%s", staticArg.GetReqName(), url.QueryEscape(staticArg.ValueStr()))
+				return fmt.Sprintf("%s=%s", staticArg.GetReqName(), url.QueryEscape(staticArg.ValueStr(false)))
 			} else if dynamicArg, ok := item.(DynamicArg); ok {
 				receiver.ReplacePathArgNames = append(receiver.ReplacePathArgNames, dynamicArg.ParaName)
 				return fmt.Sprintf("%s=%s", dynamicArg.GetReqName(), dynamicArg.ValueFormatter())

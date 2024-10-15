@@ -54,6 +54,7 @@ func main() {
 				ReturnType: decodeType(req.ReturnType),
 			}
 
+			decodedReq.HeaderArgs = decodeArgs(req.HeaderArgs)
 			decodedReq.QueryArgs = decodeArgs(req.QueryArgs)
 			decodedReq.PathArgs = decodeArgs(req.PathArgs)
 			decodedReq.BodyArgs = decodeArgs(req.BodyArgs)

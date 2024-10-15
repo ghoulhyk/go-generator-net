@@ -15,7 +15,7 @@ func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.Para
         __body__, __err__ = _import_json.Marshal(
         map[string]any{
              {{ range $arg := .Req.BodyArgs -}}
-                 "{{ $arg.GetReqName }}": {{ if eq $arg.GetValWay "Dynamic" }} {{ $arg.GetReqName }} {{ else if eq $arg.GetValWay "Static" }} {{ $arg.ValueForBody }} {{ end }},
+                 "{{ $arg.GetReqName }}": {{ if eq $arg.GetValWay "Dynamic" }} {{ $arg.ParaName }} {{ else if eq $arg.GetValWay "Static" }} {{ $arg.ValueForBody }} {{ end }},
              {{ end }}
         },
     )
@@ -27,7 +27,7 @@ func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.Para
 	__req__, err := _import_http.NewRequest("{{ .Req.Method }}", __url__, _import_bytes.NewReader(__body__))
 
     {{ range $arg := .Req.HeaderArgs }}
-        __req__.Header.Set("{{ $arg.GetReqName }}": {{ if eq $arg.GetValWay "Dynamic" }} {{ $arg.GetReqName }} {{ else if eq $arg.GetValWay "Static" }} {{ $arg.ValueStr }} {{ end }})
+        __req__.Header.Set("{{ $arg.GetReqName }}", {{ if eq $arg.GetValWay "Dynamic" }} {{ $arg.ParaName }} {{ else if eq $arg.GetValWay "Static" }} {{ $arg.ValueStr true }} {{ end }})
     {{ end }}
 
     {{ if eq .Req.Method "POST" }}

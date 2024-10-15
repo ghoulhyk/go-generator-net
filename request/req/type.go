@@ -25,7 +25,7 @@ func (receiver Req) SetReturnType(returnType resp.IResp) Req {
 // region params
 
 func (receiver Req) AddHeader(header arg.Arg) Req {
-	receiver.HeaderArgs = append(receiver.QueryArgs, header)
+	receiver.HeaderArgs = append(receiver.HeaderArgs, header)
 	return receiver
 }
 
