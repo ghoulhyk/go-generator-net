@@ -3,11 +3,11 @@ package types
 import (
 	"fmt"
 	"github.com/ghoulhyk/go-generator-net/types/const"
+	"github.com/ghoulhyk/go-generator-net/util/sliceutil"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"net/url"
 	"regexp"
-	"slices"
 	"strings"
 )
 
@@ -26,7 +26,7 @@ type Req struct {
 }
 
 func (receiver Req) args() []Arg {
-	return slices.Concat(receiver.HeaderArgs, receiver.PathArgs, receiver.QueryArgs, receiver.BodyArgs)
+	return sliceutil.Concat(receiver.HeaderArgs, receiver.PathArgs, receiver.QueryArgs, receiver.BodyArgs)
 }
 
 func (receiver Req) ParamArgs() []Arg {
