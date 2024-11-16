@@ -7,12 +7,12 @@ import (
 	"os"
 	"reflect"
 	"regexp"
-	"slices"
 	"strings"
 	templ "{{ .TmplPkg }}"
 	"github.com/ghoulhyk/go-generator-net/request"
 	"github.com/ghoulhyk/go-generator-net/request/arg"
 	"github.com/ghoulhyk/go-generator-net/types"
+	"github.com/ghoulhyk/go-generator-net/util/sliceutil"
 	_const "github.com/ghoulhyk/go-generator-net/types/const"
 )
 
@@ -76,7 +76,7 @@ func decodeType(val any) types.RType {
 		return item[1]
 	})
 	if len(subPkgPathList) > 0 {
-		pkgPathList = slices.Concat(pkgPathList, subPkgPathList)
+		pkgPathList = sliceutil.Concat(pkgPathList, subPkgPathList)
 		ident = pkgPathWithoutLastReg.ReplaceAllString(ident, "")
 	}
 	pkgPathList = lo.Uniq(pkgPathList)
