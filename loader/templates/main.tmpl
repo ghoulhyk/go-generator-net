@@ -71,7 +71,14 @@ func main() {
 func decodeType(val any) types.RType {
 	reflectType := reflect.TypeOf(val)
 	ident := reflectType.String()
-	pkgPathList := []string{reflectType.PkgPath()}
+	var pkgPathList []string
+	// 判断是否为数组或切片类型
+	if reflectType.Kind() == reflect.Array || reflectType.Kind() == reflect.Slice {
+		// 处理数组或切片类型的逻辑
+		pkgPathList = []string{reflectType.Elem().PkgPath()}
+	} else {
+		pkgPathList = []string{reflectType.PkgPath()}
+	}
 	subPkgPathList := lo.Map(pkgPathReg.FindAllStringSubmatch(ident, -1), func(item []string, index int) string {
 		return item[1]
 	})
