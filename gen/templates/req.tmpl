@@ -19,6 +19,7 @@ func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.Para
         __body__, __err__ = _import_json.Marshal(
         map[string]any{
              {{ range $arg := .Req.BodyArgs -}}
+                 {{- if isPartArg $arg }} {{ continue }} {{ end -}}
                  "{{ $arg.GetReqName }}": {{ if eq $arg.GetValWay "Dynamic" }} {{ $arg.ParaName }} {{ else if eq $arg.GetValWay "Static" }} {{ $arg.ValueForBody }} {{ end }},
              {{ end }}
         },

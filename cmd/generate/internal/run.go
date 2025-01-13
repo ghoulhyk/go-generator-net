@@ -1,4 +1,4 @@
-package generate
+package internal
 
 import (
 	"github.com/ghoulhyk/go-generator-net/gen"
@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func run(srcDir, dstDir string) error {
+func Run(srcDir, dstDir string) error {
 	println("gen")
 	var err error
 

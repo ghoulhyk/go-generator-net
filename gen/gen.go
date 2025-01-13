@@ -17,8 +17,9 @@ const servDirName = "internal"
 func GenerateServ(dstPath string, services []types.Service) error {
 	tmpl, err := template.New("").
 		Funcs(template.FuncMap{
-			"dict":   dict,
-			"pascal": pascal,
+			"isPartArg": isPartArg,
+			"dict":      dict,
+			"pascal":    pascal,
 		}).
 		ParseFS(templates.Fs, "serv.tmpl", "req.tmpl")
 	if err != nil {
@@ -66,8 +67,9 @@ func GenerateClient(dstPath string, services []types.Service) error {
 	pkgName := filepath.Base(dstPath)
 	tmpl, err := template.New("").
 		Funcs(template.FuncMap{
-			"dict":   dict,
-			"pascal": pascal,
+			"isPartArg": isPartArg,
+			"dict":      dict,
+			"pascal":    pascal,
 		}).
 		ParseFS(templates.Fs, "client.tmpl")
 	if err != nil {

@@ -2,6 +2,8 @@ package gen
 
 import (
 	"fmt"
+	"github.com/ghoulhyk/go-generator-net/types"
+	_const "github.com/ghoulhyk/go-generator-net/types/const"
 	"github.com/go-openapi/inflect"
 	"strconv"
 	"strings"
@@ -12,6 +14,13 @@ var (
 	rules    = ruleset()
 	acronyms = make(map[string]struct{})
 )
+
+func isPartArg(v types.Arg) bool {
+	if dynamicArg, ok := v.(types.DynamicArg); ok {
+		return dynamicArg.Type == _const.TypePart
+	}
+	return false
+}
 
 func dict(v ...any) map[string]any {
 	lenv := len(v)

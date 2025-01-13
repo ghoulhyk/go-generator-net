@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
+	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"os"
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -20,7 +21,6 @@ var serviceList = []request.Interface{
     {{ range $name := .ServNames }}
 	    templ.{{ $name }}{},
     {{ end }}
-	//templ.Common2{},
 }
 
 var pkgPathReg, _ = regexp.Compile("(([^[\\] ,\"']+/)+([^[\\] ,\"']+))\\.")
@@ -99,35 +99,58 @@ func decodeArgs(args []arg.Arg) []types.Arg {
 		return []types.Arg{}
 	}
 
-	return lo.Map(args, func(item arg.Arg, _ int) types.Arg {
+	return lo.FlatMap(args, func(item arg.Arg, _ int) []types.Arg {
 		switch item.(type) {
 		case arg.StaticArg:
 			{
-				arg := item.(arg.StaticArg)
-				return types.StaticArg{
-					ReqName: arg.GetReqName(),
-					Value:   arg.Value,
+				argVal := item.(arg.StaticArg)
+				return []types.Arg{
+					types.StaticArg{
+						ReqName: argVal.GetReqName(),
+						Value:   argVal.Value,
+					},
 				}
 			}
 		case arg.DynamicArg:
 			{
-				arg := item.(arg.DynamicArg)
+				argVal := item.(arg.DynamicArg)
 
+				var appendArgs []types.Arg
 				decodeArg := types.DynamicArg{
-					ReqName:  arg.GetReqName(),
-					ParaName: arg.ParaName,
-					Type:     arg.Type,
+					ReqName:  argVal.GetReqName(),
+					ParaName: argVal.ParaName,
+					Type:     argVal.Type,
 				}
-				if arg.Type == _const.TypeCustom {
-					decodeArg.CustomType = lo.ToPtr(decodeType(arg.CustomType))
+				if argVal.Type == _const.TypeCustom {
+					decodeArg.CustomType = lo.ToPtr(decodeType(argVal.CustomType))
 				}
-				if arg.IsPtr() {
+				if argVal.Type == _const.TypePart {
+					decodeArg.CustomType = lo.ToPtr(decodeType(argVal.CustomType))
+					argReflectType := reflect.TypeOf(argVal.CustomType)
+					if argVal.IsPtr() {
+						// part类型不能是指针
+						fail(errors.Errorf("参数[%s]解析错误，part类型不能是指针", argVal.ParaName))
+					}
+					if argReflectType.Kind() != reflect.Struct {
+						// part类型必须为结构体
+						fail(errors.Errorf("参数[%s]解析错误，part类型必须为结构体", argVal.ParaName))
+					}
+					for i := 0; i < argReflectType.NumField(); i++ {
+						field := argReflectType.Field(i)
+						appendArgs = append(appendArgs, types.StaticArg{
+							ReqName:       field.Tag.Get("reqPart"),
+							Value:         fmt.Sprintf("%s.%s", item.GetReqName(), field.Name),
+							ForceNotQuote: true,
+						})
+					}
+				}
+				if argVal.IsPtr() {
 					decodeArg.PtrType = true
 				}
-				return decodeArg
+				return append([]types.Arg{decodeArg}, appendArgs...)
 			}
 		default:
-			panic("不支持的参数类型")
+			panic("参数[%s]解析错误，不支持的参数类型")
 		}
 	})
 }

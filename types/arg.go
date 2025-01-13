@@ -10,6 +10,11 @@ import (
 
 type Arg interface {
 	GetReqName() string
+	/*
+	 请求数据的来源
+	 Dynamic: 由生成方法的方法参数动态传入
+	 Static: 由定义时固定写死
+	*/
 	GetValWay() string
 }
 
@@ -50,7 +55,7 @@ func (s *Args) UnmarshalJSON(data []byte) error {
 // region DynamicArg
 
 type DynamicArg struct {
-	ParaName string // 参数名
+	ParaName string // 参数名，生成方法的形参名
 	Type     _const.DefType
 
 	ReqName    string // 请求参数名
@@ -74,6 +79,8 @@ func (receiver DynamicArg) TypeStr() string {
 	typeStr := ""
 	switch receiver.Type {
 	case _const.TypeCustom:
+		typeStr = receiver.CustomType.Ident
+	case _const.TypePart:
 		typeStr = receiver.CustomType.Ident
 	case _const.TypeBool:
 		typeStr = "bool"
@@ -120,6 +127,8 @@ func (receiver DynamicArg) TypeStr() string {
 func (receiver DynamicArg) PkgPathList() []string {
 	switch receiver.Type {
 	case _const.TypeCustom:
+		return receiver.CustomType.PkgPathList
+	case _const.TypePart:
 		return receiver.CustomType.PkgPathList
 	case _const.TypeTime:
 		return []string{"time"}
@@ -173,8 +182,9 @@ func (receiver DynamicArg) MarshalJSON() ([]byte, error) {
 // region StaticArg
 
 type StaticArg struct {
-	ReqName string // 请求参数名
-	Value   any
+	ReqName       string // 请求参数名
+	Value         any
+	ForceNotQuote bool // 是否强制不引号，目前用于Type等于Part的字段提取的子字段
 }
 
 func (receiver StaticArg) GetReqName() string {
@@ -192,7 +202,7 @@ func (receiver StaticArg) ValueStr(quoteStr bool) string {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return fmt.Sprintf("%d", receiver.Value)
 	case string:
-		if quoteStr {
+		if quoteStr && !receiver.ForceNotQuote {
 			return strconv.Quote(receiver.Value.(string))
 		} else {
 			return receiver.Value.(string)
@@ -203,6 +213,12 @@ func (receiver StaticArg) ValueStr(quoteStr bool) string {
 }
 
 func (receiver StaticArg) ValueForBody() any {
+	switch receiver.Value.(type) {
+	case string:
+		if receiver.ForceNotQuote {
+			return receiver.Value.(string)
+		}
+	}
 	return fmt.Sprintf("%#v", receiver.Value)
 }
 

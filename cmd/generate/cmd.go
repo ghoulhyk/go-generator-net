@@ -1,6 +1,7 @@
 package generate
 
 import (
+	"github.com/ghoulhyk/go-generator-net/cmd/generate/internal"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -13,7 +14,7 @@ func Cmd() *cobra.Command {
 		Example: "go-generator-net generate ./templ --target ./remoteServ",
 		Args:    cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, srcDir []string) {
-			err := run(srcDir[0], target)
+			err := internal.Run(srcDir[0], target)
 			if err != nil {
 				log.Fatalln(err)
 			}

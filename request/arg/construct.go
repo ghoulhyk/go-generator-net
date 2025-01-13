@@ -7,6 +7,9 @@ import (
 func Custom(name string, customType any) DynamicArg {
 	return DynamicArg{ParaName: name, ReqName: name, Type: _const.TypeCustom, CustomType: customType}
 }
+func Part(name string, customType any) DynamicArg {
+	return DynamicArg{ParaName: name, ReqName: name, Type: _const.TypePart, CustomType: customType}
+}
 func Bool(name string) DynamicArg {
 	return DynamicArg{ParaName: name, ReqName: name, Type: _const.TypeBool}
 }

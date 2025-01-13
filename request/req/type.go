@@ -2,7 +2,9 @@ package req
 
 import (
 	"github.com/ghoulhyk/go-generator-net/request/arg"
+	"github.com/ghoulhyk/go-generator-net/request/req/contentType"
 	"github.com/ghoulhyk/go-generator-net/request/resp"
+	"github.com/ghoulhyk/go-generator-net/request/resp/respDecoder"
 	"github.com/ghoulhyk/go-generator-net/types/const"
 )
 
@@ -15,10 +17,25 @@ type Req struct {
 	QueryArgs  []arg.Arg
 	PathArgs   []arg.Arg
 	BodyArgs   []arg.Arg
+
+	// todo
+	ContentType contentType.Type
+	// todo
+	ResponseDecoder respDecoder.Decoder
 }
 
 func (receiver Req) SetReturnType(returnType resp.IResp) Req {
 	receiver.ReturnType = returnType
+	return receiver
+}
+
+func (receiver Req) SetContentType(typeVal contentType.Type) Req {
+	receiver.ContentType = typeVal
+	return receiver
+}
+
+func (receiver Req) SetResultDecoder(decoder respDecoder.Decoder) Req {
+	receiver.ResponseDecoder = decoder
 	return receiver
 }
 
