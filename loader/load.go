@@ -53,7 +53,7 @@ func Load(srcDir string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	//defer os.RemoveAll(genMainPath)
+	defer os.RemoveAll(genMainPath)
 
 	return gorun(genMainPath, nil)
 }
