@@ -137,8 +137,15 @@ func decodeArgs(args []arg.Arg) []types.Arg {
 					}
 					for i := 0; i < argReflectType.NumField(); i++ {
 						field := argReflectType.Field(i)
+						reqName := field.Tag.Get("reqPart")
+						if reqName == "-" {
+							continue
+						}
+						if reqName == "" {
+							reqName = field.Name
+						}
 						appendArgs = append(appendArgs, types.StaticArg{
-							ReqName:       field.Tag.Get("reqPart"),
+							ReqName:       reqName,
 							Value:         fmt.Sprintf("%s.%s", item.GetReqName(), field.Name),
 							ForceNotQuote: true,
 						})
