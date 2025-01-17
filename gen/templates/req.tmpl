@@ -29,7 +29,11 @@ func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.Para
             return nil, _import_errors.New("序列化请求体失败，" + __err__.Error())
         }
     {{ end }}
-    __req__, err := _import_http.NewRequest("{{ .Req.Method }}", __url__, _import_bytes.NewReader(__body__))
+    __req__, __err__ := _import_http.NewRequest("{{ .Req.Method }}", __url__, _import_bytes.NewReader(__body__))
+    if __err__ != nil {
+        __receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | 构建请求失败 | {{ .Req.Method }} | 【url=%v】 | 【message=%v】", __url__, __err__)
+        return nil, _import_errors.New("构建请求失败，" + __err__.Error())
+    }
 
     {{ range $arg := .Req.HeaderArgs }}
         __req__.Header.Set("{{ $arg.GetReqName }}", {{ if eq $arg.GetValWay "Dynamic" }} {{ $arg.ParaName }} {{ else if eq $arg.GetValWay "Static" }} {{ $arg.ValueStr true }} {{ end }})
@@ -56,7 +60,7 @@ func (__receiver__ {{ .StructName }}) {{ .Req.Name }}({{ range $arg := .Req.Para
 
     __result__ := &{{ .Req.ReturnType.Ident }}{}
 
-    if err = _import_json.Unmarshal(__respBytes__, __result__); err != nil {
+    if __err__ = _import_json.Unmarshal(__respBytes__, __result__); __err__ != nil {
         __receiver__.originTmpl.ErrorLog("{{ .StructName }}.{{ .Req.Name }} | JSON解析失败 | {{ .Req.Method }} | 【url=%v】 | 【message=%v】 | 【reqResult=%v】", __url__, __err__, string(__respBytes__))
         return nil, _import_errors.New("JSON解析失败，" + __err__.Error())
     }
